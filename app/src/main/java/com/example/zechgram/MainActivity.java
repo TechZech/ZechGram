@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private BottomNavigationView bottomNavigationView;
+    private boolean logout = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+                logout = false;
                 Fragment fragment;
                 switch (menuItem.getItemId()) {
                     case R.id.action_home:
@@ -62,16 +64,32 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.action_compose:
                         fragment = new ComposeFragment();
                         break;
+                    case R.id.action_logout:
+                        logout = true;
+                        fragment = new ProfileFragment();
+                        break;
                     case R.id.action_profile:
                     default:
                         fragment = new ProfileFragment();
                         break;
                 }
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                if (!logout){
+                    fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                }
+                else{
+                    ParseUser.logOut();
+                    goLogInActivity();
+                }
                 return true;
             }
         });
         // Set default selection
         bottomNavigationView.setSelectedItemId(R.id.action_home);
+    }
+
+    private void goLogInActivity() {
+        Intent i = new Intent(this, LoginActivity.class);
+        startActivity(i);
+        finish();
     }
 }
